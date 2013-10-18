@@ -52,13 +52,13 @@ int main(int argc, char** argv) {
     }
     if (FD_ISSET(sfd, &rmask)) {
       slt = sizeof(caddr);
-		  if ((cfd = accept(sfd, (struct sockaddr*)&caddr, &slt)) < 0)
+      if ((cfd = accept(sfd, (struct sockaddr*)&caddr, &slt)) < 0)
         ERROR("accept()")
       printf("new connection: %s\n",
              inet_ntoa((struct in_addr)caddr.sin_addr));
-		  FD_SET(cfd, &mask);
+      FD_SET(cfd, &mask);
       if (cfd > fdmax) fdmax = cfd;
-		}
+}
     for (i = 0; i <= fdmax; i++)
       if (FD_ISSET(i, &wmask)) {
         write(i, "Hello World!\n", 13);
