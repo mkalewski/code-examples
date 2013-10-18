@@ -9,4 +9,4 @@ Code Examples
 Description
 ===========
 
-Code examples for students and other self learners.
+A set of minimal working code examples for students and other self learners.
