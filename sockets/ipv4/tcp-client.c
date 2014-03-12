@@ -1,3 +1,11 @@
+//  Copyright (C) 2013-2014 Michal Kalewski  <mkalewski at cs.put.poznan.pl>
+//
+//  This program comes with ABSOLUTELY NO WARRANTY.
+//  THIS IS FREE SOFTWARE, AND YOU ARE WELCOME TO REDISTRIBUTE IT UNDER THE
+//  TERMS AND CONDITIONS OF THE MIT LICENSE.  YOU SHOULD HAVE RECEIVED A COPY
+//  OF THE LICENSE ALONG WITH THIS SOFTWARE; IF NOT, YOU CAN DOWNLOAD A COPY
+//  FROM HTTP://WWW.OPENSOURCE.ORG.
+
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +15,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#define ERROR(f) { perror(f); exit(EXIT_FAILURE); }
+#define ERROR(e) { perror(e); exit(EXIT_FAILURE); }
 #define BUFFER_SIZE 1024
 
 int main(int argc, char** argv) {

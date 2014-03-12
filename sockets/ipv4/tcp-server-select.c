@@ -1,3 +1,11 @@
+//  Copyright (C) 2013-2014 Michal Kalewski  <mkalewski at cs.put.poznan.pl>
+//
+//  This program comes with ABSOLUTELY NO WARRANTY.
+//  THIS IS FREE SOFTWARE, AND YOU ARE WELCOME TO REDISTRIBUTE IT UNDER THE
+//  TERMS AND CONDITIONS OF THE MIT LICENSE.  YOU SHOULD HAVE RECEIVED A COPY
+//  OF THE LICENSE ALONG WITH THIS SOFTWARE; IF NOT, YOU CAN DOWNLOAD A COPY
+//  FROM HTTP://WWW.OPENSOURCE.ORG.
+
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,13 +16,13 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
-#define ERROR(f) { perror(f); exit(EXIT_FAILURE); }
+#define ERROR(e) { perror(e); exit(EXIT_FAILURE); }
 #define SERVER_PORT 1234
 #define QUEUE_SIZE 5
 
 int main(int argc, char** argv) {
   socklen_t slt;
-  int sfd, cfd, fdmax, rc, i, on = 1;
+  int sfd, cfd, fdmax, fda, rc, i, on = 1;
   struct sockaddr_in saddr, caddr;
   static struct timeval timeout;
   fd_set mask, rmask, wmask;
@@ -26,7 +34,8 @@ int main(int argc, char** argv) {
 
   if ((sfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     ERROR("socket()")
-  setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on));
+  if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on)) < 0)
+    ERROR("setsockopt()")
   if (bind(sfd, (struct sockaddr*)&saddr, sizeof(saddr)) < 0)
     ERROR("bind()")
   if (listen(sfd, QUEUE_SIZE) < 0)
@@ -42,15 +51,17 @@ int main(int argc, char** argv) {
     wmask = mask;
     timeout.tv_sec = 5 * 60;
     timeout.tv_usec = 0;
-    if ((rc = select(fdmax + 1, &rmask, &wmask, (fd_set*)0, &timeout)) < 0)
+    if ((rc = select(fdmax+1, &rmask, &wmask, (fd_set*)0, &timeout)) < 0)
       ERROR("select()")
 
     if (rc == 0) {
       printf("timed out\n");
-      fflush(stdout);
       continue;
     }
+
+    fda = rc;
     if (FD_ISSET(sfd, &rmask)) {
+      fda -= 1;
       slt = sizeof(caddr);
       if ((cfd = accept(sfd, (struct sockaddr*)&caddr, &slt)) < 0)
         ERROR("accept()")
@@ -58,12 +69,17 @@ int main(int argc, char** argv) {
              inet_ntoa((struct in_addr)caddr.sin_addr));
       FD_SET(cfd, &mask);
       if (cfd > fdmax) fdmax = cfd;
-}
-    for (i = 0; i <= fdmax; i++)
+    }
+
+    for (i = sfd+1; i <= fdmax && fda > 0; i++)
       if (FD_ISSET(i, &wmask)) {
+        fda -= 1;
         write(i, "Hello World!\n", 13);
-        FD_CLR(i, &mask);
         close(i);
+        FD_CLR(i, &mask);
+        if (i == fdmax)
+          while(fdmax > sfd && !FD_ISSET(fdmax, &mask))
+            fdmax -= 1;
       }
   }
 

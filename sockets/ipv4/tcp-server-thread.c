@@ -1,3 +1,11 @@
+//  Copyright (C) 2013-2014 Michal Kalewski  <mkalewski at cs.put.poznan.pl>
+//
+//  This program comes with ABSOLUTELY NO WARRANTY.
+//  THIS IS FREE SOFTWARE, AND YOU ARE WELCOME TO REDISTRIBUTE IT UNDER THE
+//  TERMS AND CONDITIONS OF THE MIT LICENSE.  YOU SHOULD HAVE RECEIVED A COPY
+//  OF THE LICENSE ALONG WITH THIS SOFTWARE; IF NOT, YOU CAN DOWNLOAD A COPY
+//  FROM HTTP://WWW.OPENSOURCE.ORG.
+
 #include <netdb.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -10,7 +18,7 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 
-#define ERROR(f) { perror(f); exit(EXIT_FAILURE); }
+#define ERROR(e) { perror(e); exit(EXIT_FAILURE); }
 #define SERVER_PORT 1234
 #define QUEUE_SIZE 5
 
@@ -42,7 +50,8 @@ int main(int argc, char** argv) {
 
   if ((sfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     ERROR("socket()")
-  setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on));
+  if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, (char*)&on, sizeof(on)) < 0)
+    ERROR("setsockopt()")
   if (bind(sfd, (struct sockaddr*)&saddr, sizeof(saddr)) < 0)
     ERROR("bind()")
   if (listen(sfd, QUEUE_SIZE) < 0)

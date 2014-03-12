@@ -1,3 +1,11 @@
+//  Copyright (C) 2013-2014 Michal Kalewski  <mkalewski at cs.put.poznan.pl>
+//
+//  This program comes with ABSOLUTELY NO WARRANTY.
+//  THIS IS FREE SOFTWARE, AND YOU ARE WELCOME TO REDISTRIBUTE IT UNDER THE
+//  TERMS AND CONDITIONS OF THE MIT LICENSE.  YOU SHOULD HAVE RECEIVED A COPY
+//  OF THE LICENSE ALONG WITH THIS SOFTWARE; IF NOT, YOU CAN DOWNLOAD A COPY
+//  FROM HTTP://WWW.OPENSOURCE.ORG.
+
 #include <netdb.h>
 #include <signal.h>
 #include <stdio.h>
@@ -10,7 +18,7 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 
-#define ERROR(f) { perror(f); exit(EXIT_FAILURE); }
+#define ERROR(e) { perror(e); exit(EXIT_FAILURE); }
 #define SERVER_PORT 1234
 #define QUEUE_SIZE 5
 
