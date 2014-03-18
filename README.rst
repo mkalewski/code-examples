@@ -4,7 +4,7 @@ Code Examples
 
 :Author:  Michał Kalewski
 :Source:  https://github.com/mkalewski/code-examples
-:Version: 1.1.1
+:Version: 1.1.2
 
 Description
 ===========
