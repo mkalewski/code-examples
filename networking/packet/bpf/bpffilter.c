@@ -1,14 +1,16 @@
 /*
  * Copyright (C) 2016 Michal Kalewski <mkalewski at cs.put.poznan.pl>
  *
- * Compilation:  gcc -Wall ./ethsniff.c -o ./ethsniff
- * Usage:        ./ethsniff INTERFACE
- * NOTE:         This program requires root privileges.
+ * Compilation:  gcc -Wall ./bpffilter.c -o ./bpffilter
+ * Usage:        ./bpffilter INTERFACE
+ * NOTE #1:      This program requires root privileges.
+ * NOTE #2:      Use FILTER below to switch between filters.
  *
  */
 
 #include <arpa/inet.h>
 #include <ctype.h>
+#include <linux/filter.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
 #include <linux/if_packet.h>
@@ -19,8 +21,31 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#define FILTER arp_filter
+
 int sfd;
 struct ifreq ifr;
+
+struct sock_filter arp_filter[] = {  /* tcpdump -dd arp */
+  { 0x28, 0, 0, 0x0000000c },
+  { 0x15, 0, 1, 0x00000806 },
+  { 0x06, 0, 0, 0x0000ffff },
+  { 0x06, 0, 0, 0x00000000 }
+};
+
+struct sock_filter icmp_filter[] = {  /* tcpdump -dd icmp */
+  { 0x28, 0, 0, 0x0000000c },
+  { 0x15, 0, 3, 0x00000800 },
+  { 0x30, 0, 0, 0x00000017 },
+  { 0x15, 0, 1, 0x00000001 },
+  { 0x06, 0, 0, 0x0000ffff },
+  { 0x06, 0, 0, 0x00000000 }
+};
+
+struct sock_fprog bpf = {
+  .len = (sizeof(FILTER) / sizeof(FILTER[0])),
+  .filter = FILTER
+};
 
 void cleanup() {
   ifr.ifr_flags &= ~IFF_PROMISC;
@@ -100,6 +125,7 @@ int main(int argc, char** argv) {
   atexit(cleanup);
   signal(SIGINT, stop);
   sfd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+  setsockopt(sfd, SOL_SOCKET, SO_ATTACH_FILTER, &bpf, sizeof(bpf));
   strncpy(ifr.ifr_name, argv[1], IFNAMSIZ);
   ioctl(sfd, SIOCGIFFLAGS, &ifr);
   ifr.ifr_flags |= IFF_PROMISC;
