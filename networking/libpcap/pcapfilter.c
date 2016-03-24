@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
   pcap_compile(handle, &fp, argv[2], 0, netp);
   if (pcap_setfilter(handle, &fp) < 0) {
     pcap_perror(handle, "pcap_setfilter()");
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
   pcap_loop(handle, -1, trap, NULL);
 }
