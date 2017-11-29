@@ -21,7 +21,7 @@ int _atoi(const char *a) {
 }
 
 /* sample proposal  -- accepted
- * one more proposal
+ * one more proposal -- accepted
  */
 
 int main(int argc, char** argv) {
