@@ -20,7 +20,7 @@ int _atoi(const char *a) {
   return s * i;
 }
 
-/* sample proposal */
+/* sample proposal  -- accepted */
 
 int main(int argc, char** argv) {
   if (argc > 1)
