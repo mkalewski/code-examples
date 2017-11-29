@@ -20,6 +20,8 @@ int _atoi(const char *a) {
   return s * i;
 }
 
+/* sample proposal */
+
 int main(int argc, char** argv) {
   if (argc > 1)
     printf("%d\n", _atoi(argv[1]));
